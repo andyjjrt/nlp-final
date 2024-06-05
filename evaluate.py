@@ -12,7 +12,7 @@ parser.add_argument(
 parser.add_argument("--lora", type=str, help="LORA output name", default="lora_all_default")
 parser.add_argument("--round", type=int, help="Evaluation rounds", default=20)
 parser.add_argument(
-    "--q4", type=bool, help="Use bnbq4", default=False
+    "--q4", help="Use bnbq4", action="store_true"
 )
 args = parser.parse_args()
 

@@ -33,7 +33,7 @@ parser.add_argument(
     "--batch_size", type=int, help="Batch size, if your vran is low, use 1", default=4
 )
 parser.add_argument(
-    "--q4", type=bool, help="Use bnbq4", default=False
+    "--q4", help="Use bnbq4", action="store_true"
 )
 
 args = parser.parse_args()

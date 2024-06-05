@@ -16,13 +16,14 @@ print(args)
 merged_data = pd.DataFrame()
 
 # Merge CSV files
-for f in os.listdir("data/output"):
-    if f.startswith("dataset_filtered_"):
-      df = pd.read_csv(f"data/output/{f}")
-      merged_data = pd.concat([merged_data, df], ignore_index=True)
+if os.path.exists("data/output"):
+    for f in os.listdir("data/output"):
+        if f.startswith("dataset_filtered_"):
+            df = pd.read_csv(f"data/output/{f}")
+            merged_data = pd.concat([merged_data, df], ignore_index=True)
 
-# Save the merged DataFrame to a new CSV file
-merged_data.to_csv('data/data.csv', index=False)
+    # Save the merged DataFrame to a new CSV file
+    merged_data.to_csv('data/data.csv', index=False)
 
 dataset = merged_data.head(args.num)
 train_dataset = dataset.sample(frac=args.frac, random_state=42)
