@@ -1,0 +1,8 @@
+output/
+data/
+steps/
+
+__pycache__/
+*.pyc
+
+.env
