@@ -11,6 +11,9 @@ parser.add_argument(
 )
 parser.add_argument("--lora", type=str, help="LORA output name", default="lora_all_default")
 parser.add_argument("--round", type=int, help="Evaluation rounds", default=20)
+parser.add_argument(
+    "--q4", type=bool, help="Use bnbq4", default=False
+)
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -19,6 +22,7 @@ if __name__ == "__main__":
         prompt=prompt,
         model=args.model,
         lora=f"output/{args.lora}",
+        q4=args.q4
     )
 
     eval_count = args.round

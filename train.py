@@ -5,10 +5,12 @@ from transformers import (
     TrainingArguments,
     Trainer,
     DataCollatorForSeq2Seq,
+    BitsAndBytesConfig,
 )
 from datasets import Dataset
 import pandas as pd
 import argparse, os
+import torch
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -27,11 +29,29 @@ parser.add_argument("--lora_alpha", type=int, help="Lora Config lora_alpha", def
 parser.add_argument(
     "--lora_dropout", type=int, help="Lora Config lora_dropout", default=0.1
 )
+parser.add_argument(
+    "--batch_size", type=int, help="Batch size, if your vran is low, use 1", default=4
+)
+parser.add_argument(
+    "--q4", type=bool, help="Use bnbq4", default=False
+)
+
 args = parser.parse_args()
 
 # load model and tokenizer
 model = AutoModelForCausalLM.from_pretrained(
-    args.model, token=HF_TOKEN, trust_remote_code=True
+    args.model,
+    token=HF_TOKEN,
+    trust_remote_code=True,
+    quantization_config=BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_compute_dtype=torch.bfloat16,
+        bnb_4bit_quant_storage=torch.bfloat16,
+    ) if args.q4 else None,
+    device_map="auto",
+    torch_dtype=torch.bfloat16,
 )
 tokenizer = AutoTokenizer.from_pretrained(
     args.tokenizer, token=HF_TOKEN, trust_remote_code=True
@@ -91,10 +111,10 @@ output_name = args.name
 train_args = TrainingArguments(
     output_dir=f"./steps/{output_name}",
     learning_rate=1e-4,
-    per_device_train_batch_size=4,
+    per_device_train_batch_size=args.batch_size,
     gradient_accumulation_steps=4,
-    logging_steps=10,
-    save_steps=50,
+    logging_steps=100,
+    save_steps=200,
 )
 
 trainer = Trainer(

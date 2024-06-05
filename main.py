@@ -7,6 +7,9 @@ parser.add_argument(
     "--model", type=str, help="Target model", default="apple/OpenELM-1_1B-Instruct"
 )
 parser.add_argument("--lora", type=str, help="Output name", default="lora_all_default")
+parser.add_argument(
+    "--q4", type=bool, help="Use bnbq4", default=False
+)
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -22,6 +25,7 @@ if __name__ == "__main__":
         prompt=prompt,
         model=args.model,
         lora=f"output/{args.lora}",
+        q4=args.q4
     )
 
     predicted: str = chain.invoke({"abstract": abstract})
