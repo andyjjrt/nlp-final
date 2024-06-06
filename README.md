@@ -11,6 +11,13 @@
 mamba env create -f environment.yml
 ```
 
+### Environent variable
+
+```
+HF_TOKEN=xxx
+OPENAI_API_KEY=xxx
+```
+
 ## Run
 
 ### Prepare dataset
@@ -115,10 +122,23 @@ We analyze the ambiguity of hashtag usages and propose a novel neural network-ba
 
 ## Result
 
-|      |  270M |  1.1B |   3B  |
-|------|-------|-------|-------|
-| fp32 | 0.747 | 0.842 |  N/A  |
-| 4bit | 0.750 | 0.767 | 0.693 |
+Scorer: rougeL fmeasure
+
+- Evaluation dataset: llama3 generated, 20 round average
+
+  |         |  270M |  1.1B |   3B  |
+  |---------|-------|-------|-------|
+  | fp32-2k | 0.747 | 0.842 |  N/A  |
+  | 4bit-2k | 0.750 | 0.767 | 0.693 |
+
+- Evaluation dataset: gpt4 generated, 20 round average
+
+  |          |  270M  | 270M-q4 |
+  |----------|--------|---------|
+  | LoRA-2k  | 0.6903 |  0.6237 |
+  | QLoRA-2k | 0.6823 |  0.5655 |
+  | LoRA-5k  | 0.7282 |  0.6915 |
+  | QLoRA-5k | 0.7008 |  0.6184 |
 
 
 ## Refrence

@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     eval_count = args.round
 
-    eval_dataset = pd.read_csv("data/eval.csv")
+    eval_dataset = pd.read_csv("data/eval_gpt4.csv")
     eval_dataset = eval_dataset.head(eval_count)
     eval_dataset = Dataset.from_pandas(eval_dataset)
 

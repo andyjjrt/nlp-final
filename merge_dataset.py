@@ -3,10 +3,10 @@ import argparse, os
 
 parser = argparse.ArgumentParser(description="Merge data and dump train/val dataset")
 parser.add_argument(
-    "--frac", type=float, help="Split frac of the file", default=0.8
+    "--frac", type=float, help="Split frac of the file", default=0.95
 )
 parser.add_argument(
-    "--num", type=int, help="Start index", default=2000
+    "--num", type=int, help="Start index", default=5000
 )
 args = parser.parse_args()
 
@@ -24,8 +24,13 @@ if os.path.exists("data/output"):
 
     # Save the merged DataFrame to a new CSV file
     merged_data.to_csv('data/data.csv', index=False)
+else:
+    merged_data = pd.read_csv(f"data/data.csv")
 
-dataset = merged_data.head(args.num)
+dataset = merged_data.sample(n=merged_data.shape[0], random_state=42)
+dataset = dataset.loc[(dataset['abstract'].str.len() > 512) & (dataset['abstract'].str.len() < 2048)]
+
+dataset = dataset.head(args.num)
 train_dataset = dataset.sample(frac=args.frac, random_state=42)
 eval_dataset = dataset.drop(train_dataset.index) 
 
