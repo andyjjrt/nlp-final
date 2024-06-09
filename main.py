@@ -4,12 +4,14 @@ import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate the model")
 parser.add_argument(
-    "--model", type=str, help="Target model", default="apple/OpenELM-1_1B-Instruct"
+    "--model",
+    type=str,
+    help="Model",
+    choices=["270M", "450M", "1_1B", "3B"],
+    default="270M",
 )
-parser.add_argument("--lora", type=str, help="Output name", default="lora_all_default")
-parser.add_argument(
-    "--q4", help="Use bnbq4", action="store_true"
-)
+parser.add_argument("--lora", type=str, help="LORA output name")
+parser.add_argument("--q4", help="Use bnbq4", action="store_true")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -23,12 +25,12 @@ if __name__ == "__main__":
 
     chain = OpenELMChain(
         prompt=prompt,
-        model=args.model,
-        lora=f"output/{args.lora}",
-        q4=args.q4
+        model=f"apple/OpenELM-{args.model}-Instruct",
+        lora=f"output/{args.lora}" if args.lora else None,
+        q4=args.q4,
     )
 
-    predicted: str = chain.invoke({"abstract": abstract})
+    predicted: str = chain.invoke(abstract=abstract)
     predicted = predicted.split("[/INST]")[1]
     print(predicted)
 

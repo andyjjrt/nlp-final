@@ -17,12 +17,14 @@ load_dotenv()
 HF_TOKEN = os.getenv("HF_TOKEN")
 
 parser = argparse.ArgumentParser(description="Train model using LORA")
-parser.add_argument("--name", type=str, help="Output name", default="lora_all_default")
 parser.add_argument(
-    "--model", type=str, help="Target model", default="apple/OpenELM-1_1B-Instruct"
+    "--model", type=str, help="Target model", choices=["270M", "450M", "1_1B", "3B"], default="270M"
 )
 parser.add_argument(
     "--tokenizer", type=str, help="Tokenizer", default="meta-llama/Llama-2-7b-hf"
+)
+parser.add_argument(
+    "--dataset", help="Dataset size", choices=["1k", "5k", "6k", "10k", "16k"], default="1k"
 )
 parser.add_argument("--r", type=int, help="Lora Config r", default=32)
 parser.add_argument("--lora_alpha", type=int, help="Lora Config lora_alpha", default=32)
@@ -40,7 +42,7 @@ args = parser.parse_args()
 
 # load model and tokenizer
 model = AutoModelForCausalLM.from_pretrained(
-    args.model,
+    f"apple/OpenELM-{args.model}-Instruct",
     token=HF_TOKEN,
     trust_remote_code=True,
     quantization_config=BitsAndBytesConfig(
@@ -84,7 +86,8 @@ def process_func(example):
     return {"input_ids": input_ids, "attention_mask": attention_mask, "labels": labels}
 
 
-train_dataset = pd.read_csv("data/train.csv")
+# train_dataset = pd.read_csv(f"data/{args.dataset}/train.csv")
+train_dataset = pd.read_csv(f"data/train_gpt.csv")
 train_dataset = Dataset.from_pandas(train_dataset)
 train_dataset = train_dataset.map(
     process_func, remove_columns=train_dataset.column_names
@@ -106,7 +109,7 @@ peft_config = LoraConfig(
 model = get_peft_model(model, peft_config)
 model.print_trainable_parameters()
 
-output_name = args.name
+output_name = f"loraV2_{args.model}_{args.model}"
 
 train_args = TrainingArguments(
     output_dir=f"./steps/{output_name}",

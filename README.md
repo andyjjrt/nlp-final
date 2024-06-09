@@ -8,7 +8,7 @@
 ## Install
 
 ```sh
-mamba env create -f environment.yml
+conda env create -f environment.yml
 ```
 
 ### Environent variable
@@ -22,64 +22,19 @@ OPENAI_API_KEY=xxx
 
 ### Prepare dataset
 
-1. Generate dataset
+1. Split dataset chunks
+    - 1k, 6k, 10k with 5x data
 
-    > This use llama3 to generate dataset, aims to make openELM be as smart as llama3 in abstract summarization, a better choice is using GPT4, but i'm poor.
+2. Generate dataset
+    - llama3
+    - gpt4o
 
-    ```sh
-    python dataset.py
-    ```
-    ```
-    usage: dataset.py [-h] [--split_count SPLIT_COUNT] [--start_index START_INDEX]
-
-    Process abstract to methods
-
-    options:
-      -h, --help            show this help message and exit
-      --split_count SPLIT_COUNT
-                            Split range of the file
-      --start_index START_INDEX
-                            Start index
-    ```
-
-2. Merge dataset and split to train/eval split
-
-    ```sh
-    python merge_datset.py
-    ```
-    ```
-    Merge data and dump train/val dataset
-
-    options:
-      -h, --help   show this help message and exit
-      --frac FRAC  Split frac of the file
-      --num NUM    Start index
-    ```
+3. Merge dataset
 
 ### Finetune model using LORA
 
-If you have `data.csv`, put it in `data/data.csv`.
-
 ```sh
 python train.py
-```
-```
-Train model using LORA
-
-options:
-  -h, --help            show this help message and exit
-  --name NAME           Output name
-  --model MODEL         Target model
-  --tokenizer TOKENIZER
-                        Tokenizer
-  --r R                 Lora Config r
-  --lora_alpha LORA_ALPHA
-                        Lora Config lora_alpha
-  --lora_dropout LORA_DROPOUT
-                        Lora Config lora_dropout
-  --batch_size BATCH_SIZE
-                        Batch size, if your vran is low, use 1
-  --q4                  Use bnbq4
 ```
 
 ### Evaluate the model
@@ -87,30 +42,11 @@ options:
 ```sh
 python evaluate.py
 ```
-```
-Evaluate the model
-
-options:
-  -h, --help     show this help message and exit
-  --model MODEL  model
-  --lora LORA    LORA output name
-  --round ROUND  Evaluation rounds
-  --q4           Use bnbq4
-```
 
 ### Run sample abstract
 
 ```sh
 python main.py
-```
-```
-Evaluate the model
-
-options:
-  -h, --help     show this help message and exit
-  --model MODEL  Target model
-  --lora LORA    Output name
-  --q4           Use bnbq4
 ```
 
 #### Sample input
@@ -122,23 +58,35 @@ We analyze the ambiguity of hashtag usages and propose a novel neural network-ba
 
 ## Result
 
-Scorer: rougeL fmeasure
 
-- Evaluation dataset: llama3 generated, 20 round average
+- V1: llama3 generated methods, no furthur data selection
+  - 270M
+    - LoRA 2k data: 0.4052257085960178
+    - LoRA 5k data: 0.45824485894693273
+    - LoRA 10k data: 0.4489090268697917
+    - QLoRA 2k data: 0.37168843564664866
+    - QLoRA 5k data: 0.4211203208519094
+    
+- V2: 90% llama3 10% gpt, 512 < abstrat length < 2048
+  - 270M
+    - LoRA 1k data: 0.4000376466453418
+    - LoRA 5k data: 0.4396882406322232
+    - LoRA 6k data: 0.43338958159823016
+    - LoRA 10k data: 0.4339534568103959
+    - LoRA 16k data: 0.47119269373354755
+  - 450M
+    - LoRA 1k data: 0.3838928409670989
+    - LoRA 5k data: 0.41486331409663285
+    - LoRA 6k data: 0.43090487953131495
+    - LoRA 10k data: 0.44012725827382954
+    - LoRA 16k data: 0.444286742569119
+  - 1.1B
+    - LoRA 1k data: 0.3796559238097318
+    - LoRA 5k data: 0.4313785272161937
+    - LoRA 6k data: 0.4323177185339683
+    - LoRA 10k data: 0.4478788758647639
+    - LoRA 16k data: 0.4582330700426558
 
-  |         |  270M |  1.1B |   3B  |
-  |---------|-------|-------|-------|
-  | fp32-2k | 0.747 | 0.842 |  N/A  |
-  | 4bit-2k | 0.750 | 0.767 | 0.693 |
-
-- Evaluation dataset: gpt4 generated, 20 round average
-
-  |          |  270M  | 270M-q4 |
-  |----------|--------|---------|
-  | LoRA-2k  | 0.6903 |  0.6237 |
-  | QLoRA-2k | 0.6823 |  0.5655 |
-  | LoRA-5k  | 0.7282 |  0.6915 |
-  | QLoRA-5k | 0.7008 |  0.6184 |
 
 
 ## Refrence
