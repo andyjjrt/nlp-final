@@ -34,7 +34,7 @@ if __name__ == "__main__":
         "top_k": 0,
     }
 
-    predicted: str = model.generate(abstract, generation_config=generation_config)
+    predicted: str = model.generate(abstract, generate_kwargs=generation_config)
     print(predicted)
 
     scorer = rouge_scorer.RougeScorer(["rougeL"])
