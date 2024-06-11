@@ -14,10 +14,6 @@ if args.size == "gpt":
             df = pd.read_csv(f"data/output/{f}")
             gpt_data = pd.concat([gpt_data, df], ignore_index=True)
     gpt_data = gpt_data.drop(columns=["methods_llama3"])
-    gpt_10k = pd.read_csv(f"data/train_gpt_10k.csv")
-    gpt_10k = gpt_10k.dropna()
-    gpt_data = pd.concat([gpt_data, gpt_10k], ignore_index=True)
-    gpt_data = gpt_data.head(5000)
     gpt_data.to_csv(f"data/train_gpt.csv", index=False)
     sys.exit()
 

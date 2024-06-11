@@ -1,4 +1,4 @@
-from infrence import OpenELMChain
+from infrence import OpenELM
 from rouge_score import rouge_scorer
 import argparse
 
@@ -12,6 +12,7 @@ parser.add_argument(
 )
 parser.add_argument("--lora", type=str, help="LORA output name")
 parser.add_argument("--q4", help="Use bnbq4", action="store_true")
+parser.add_argument("--use_config", help="Use generate config", action="store_true")
 args = parser.parse_args()
 
 if __name__ == "__main__":
@@ -21,17 +22,19 @@ if __name__ == "__main__":
     Furthermore, we apply our model to prune the self-labeled training data.
     Experimental results show that the irony detection model trained on the less but cleaner training instances outperforms the models trained on all data."""
 
-    prompt = """<s>[INST]<SYS>From the following abstract, extract the sentences that shows the methods of the research. Only the sentences from the abstract, no other information.<SYS>{abstract}[/INST]"""
-
-    chain = OpenELMChain(
-        prompt=prompt,
+    model = OpenELM(
         model=f"apple/OpenELM-{args.model}-Instruct",
         lora=f"output/{args.lora}" if args.lora else None,
         q4=args.q4,
     )
 
-    predicted: str = chain.invoke(abstract=abstract)
-    predicted = predicted.split("[/INST]")[1]
+    generation_config = {
+        "do_sample": True,
+        "temperature": 1,
+        "top_k": 0,
+    }
+
+    predicted: str = model.generate(abstract, generation_config=generation_config)
     print(predicted)
 
     scorer = rouge_scorer.RougeScorer(["rougeL"])
