@@ -160,6 +160,8 @@ We analyze the ambiguity of hashtag usages and propose a novel neural network-ba
     - LoRA SFT 10k data: 0.6141869259514844
     - LoRA SFT 16k data: **0.6434976595372202**
     - LoRA SFT gpt data: 0.5748198221119681
+  - 450M
+    - LoRA SFT 16k data: 0.6454982837614324
 
 
 ## Refrences

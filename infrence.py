@@ -14,7 +14,7 @@ import os, torch
 load_dotenv()
 
 HF_TOKEN = os.getenv("HF_TOKEN")
-DEFAULT_PROMPT = "<s>[INST]<SYS>From the following abstract, extract the sentences that shows the methods of the research. Only the sentences from the abstract, no other information.<SYS>{abstract}[/INST]"
+DEFAULT_PROMPT = "<s>[INST]<SYS>From the following abstract, extract the sentences that shows the methods of the research. Only the sentences from the abstract, and NOTHING else.<SYS>{abstract}[/INST]"
 
 
 class OpenELM:

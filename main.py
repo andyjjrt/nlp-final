@@ -30,11 +30,11 @@ if __name__ == "__main__":
 
     generation_config = {
         "do_sample": True,
-        "temperature": 1,
+        "temperature": 0.7,
         "top_k": 0,
     }
 
-    predicted: str = model.generate(abstract, generate_kwargs=generation_config)
+    predicted: str = model.generate(abstract, generate_kwargs=generation_config if args.use_config else None)
     print(predicted)
 
     scorer = rouge_scorer.RougeScorer(["rougeL"])

@@ -130,9 +130,9 @@ train_args = TrainingArguments(
     learning_rate=1e-4,
     per_device_train_batch_size=args.batch_size,
     gradient_accumulation_steps=4,
-    logging_steps=10,
+    logging_steps=100,
     eval_strategy="steps",
-    save_steps=100,
+    save_steps=500,
 )
 
 trainer = Trainer(
